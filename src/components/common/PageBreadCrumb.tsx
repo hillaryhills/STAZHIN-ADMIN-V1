@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from 'react-router-dom';
 
 interface BreadcrumbProps {
   pageTitle: string;
@@ -18,9 +18,9 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({ pageTitle }) => {
           <li>
             <Link
               className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-              to="/"
+              to="/dashboard"
             >
-              Home
+              Dashboard
               <svg
                 className="stroke-current"
                 width="17"
