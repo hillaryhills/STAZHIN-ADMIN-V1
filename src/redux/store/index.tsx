@@ -1,15 +1,28 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import authReducer from '../auth'
+import messageCenterReducer from '../messageCenter'
+import userReducer from '../user'
+import transactionReducer from '../transaction'
+import appReducer from '../app'
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  messageCenter: messageCenterReducer,
+  user: userReducer,
+  transaction: transactionReducer,
+  app: appReducer
 })
-
-export type RootState = ReturnType<typeof rootReducer>
-export type AppDispatch = typeof store.dispatch
 
 export const store = configureStore({
   reducer: rootReducer,
   devTools: process.env.NODE_ENV !== 'production',
-  middleware: (getDefaultMiddleware: any) => getDefaultMiddleware({ serializableCheck: false, immutableCheck: false }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }),
 })
+
+export type RootState = ReturnType<typeof rootReducer>
+
+export type AppDispatch = typeof store.dispatch
