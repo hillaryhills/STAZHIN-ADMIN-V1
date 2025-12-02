@@ -1,16 +1,32 @@
-import type { FC } from 'react';
+import type { FC } from "react";
 
 interface LoaderProps {
-  size?: number;       // optional size in pixels
-  color?: string;      // optional color
+  size?: number;
+  color?: string;
 }
 
-const Loader: FC<LoaderProps> = ({ size = 40, color = '#4F46E5' }) => {
+const Loader: FC<LoaderProps> = ({ size = 40, color = "#00948a" }) => {
   return (
     <div
-      style={{ width: size, height: size, borderColor: color }}
-      className="border-4 border-t-transparent border-solid rounded-full animate-spin mx-auto"
-    />
+      className="
+        fixed inset-0 
+        z-[999999] 
+        flex items-center justify-center 
+        bg-black/50 
+        backdrop-blur-md 
+        pointer-events-auto
+      "
+    >
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderColor: `${color} transparent ${color} transparent`,
+          borderWidth: 4,
+        }}
+        className="rounded-full border-solid animate-spin"
+      />
+    </div>
   );
 };
 

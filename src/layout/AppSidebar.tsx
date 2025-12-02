@@ -7,7 +7,8 @@ import {
   GridIcon,
   HorizontaLDots,
   UserCircleIcon,
-  ChatIcon
+  ChatIcon,
+  ListIcon
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -30,10 +31,21 @@ const navItems: NavItem[] = [
     path: "/users",
   },
   {
+    name: "Transactions",
+    icon: <ListIcon />,
+    subItems: [
+      { name: "All Transactions", path: "/transactions" },
+      { name: "Pending Transactions", path: "#" },
+      { name: "Completed Transactions", path: "#" },
+
+    ],
+  },
+  {
     name: "Message Center",
     icon: <ChatIcon />,
     path: "/message-center",
   },
+
 ];
 
 const othersItems: NavItem[] = [

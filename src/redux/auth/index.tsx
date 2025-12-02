@@ -18,7 +18,7 @@ const initialState: IAuthState = {
 
 export const login = createAsyncThunk('auth/login', async (data: ILoginInput, thunkAPI) => {
   try {
-    const response = await ApiPostNoAuth('api/user/login', data)
+    const response = await ApiPostNoAuth('admin/login', data)
     if (response) {
       return thunkAPI.fulfillWithValue(response)
     }

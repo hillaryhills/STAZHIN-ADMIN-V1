@@ -8,18 +8,18 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { columns, renderColumn } from "../../redux/user/interface";
-import { getAllUsers } from "../../redux/user";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import Input from "../form/input/InputField";
 import Pagination from "../ui/pagination";
 import { useNavigate } from "react-router-dom";
+import { columns, renderColumn } from "../../redux/transaction/interface";
+import { getAllTransactions } from "../../redux/transaction";
 import TableSkeleton from "../ui/skeleton/TableSkeleton";
+import EmptyState from "../ui/empty/EmptyState";
 
 
-
-export default function UsersComponent() {
+export default function TransactionComponent() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string[]>([]);
@@ -33,29 +33,19 @@ export default function UsersComponent() {
     );
   };
 
-  const { users, pagination, loading } = useSelector(
-    (state: RootState) => state.user
+  const { transactions, pagination, loading } = useSelector(
+    (state: RootState) => state.transaction
   );
 
-  // Load initial messages
   useEffect(() => {
-    dispatch(getAllUsers({ page, limit, search }));
+    dispatch(getAllTransactions({ page, limit, search }));
   }, [page, limit, search]);
-
-  // Search (debounced)
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      dispatch(getAllUsers({ page: 1, limit: 10, search }));
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [search]);
 
   return (
     <div>
       <PageMeta
-        title="Stahzin Users"
-        description="This is Stahzin Users page for Stahzin Application"
+        title="Stahzin Transactions"
+        description="This is Stahzin Transactions page for Stahzin Application"
       />
       <PageBreadcrumb pageTitle="Users" />
 
@@ -95,51 +85,54 @@ export default function UsersComponent() {
         </div>
 
 
-      <div className="mx-auto w-full overflow-x-auto">
+        <div className="mx-auto w-full overflow-x-auto">
+          {loading ? (
+            <TableSkeleton rows={6} columns={columns.length} />
+          ) : transactions?.length === 0 ? (
+            <EmptyState
+              message="Nothing to display here yet. "
+            />
+          ) : (
+            <>
+              <Table>
+                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                  <TableRow>
+                    {columns.map((col) => (
+                      <TableCell
+                        key={col.key}
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        {col.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHeader>
 
-  {loading ? (
-    <TableSkeleton rows={8} columns={columns.length} />
-  ) : (
-    <>
-      <Table>
-        <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-          <TableRow>
-            {columns.map((col) => (
-              <TableCell
-                key={col.key}
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                {col.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHeader>
+                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                  {transactions?.map((msg: any) => (
+                    <TableRow key={msg._id}>
+                      {columns.map((col) => (
+                        <TableCell key={col.key} className="px-5 py-4 text-start">
+                          {renderColumn(msg, selected, toggleSelect, navigate)[col.key]}
 
-        <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-          {users?.map((msg) => (
-            <TableRow key={msg._id}>
-              {columns.map((col) => (
-                <TableCell key={col.key} className="px-5 py-4 text-start">
-                  {renderColumn(msg, selected, toggleSelect, navigate)[col.key]}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <div className="mt-6">
+                <Pagination
+                  currentPage={pagination?.currentPage || 1}
+                  totalPages={pagination?.totalPages || 1}
+                  onPageChange={(newPage) => setPage(newPage)}
+                />
+              </div>
+            </>
+          )}
 
-      <div className="mt-6">
-        <Pagination
-          currentPage={pagination?.currentPage || 1}
-          totalPages={pagination?.totalPages || 1}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
-      </div>
-    </>
-  )}
-</div>
-
+        </div>
       </div>
     </div>
   );
