@@ -13,7 +13,7 @@ import { RootState, AppDispatch } from "../../redux/store";
 import Input from "../form/input/InputField";
 import Pagination from "../ui/pagination";
 import { useNavigate } from "react-router-dom";
-import { columns, renderColumn } from "../../redux/transaction/interface";
+import { columns, renderColumn, ITransaction } from "../../redux/transaction/interface";
 import { getAllTransactions } from "../../redux/transaction";
 import TableSkeleton from "../ui/skeleton/TableSkeleton";
 import EmptyState from "../ui/empty/EmptyState";
@@ -39,7 +39,7 @@ export default function TransactionComponent() {
 
   useEffect(() => {
     dispatch(getAllTransactions({ page, limit, search }));
-  }, [page, limit, search]);
+  }, [dispatch, page, limit, search]);
 
   return (
     <div>
@@ -88,7 +88,7 @@ export default function TransactionComponent() {
         <div className="mx-auto w-full overflow-x-auto">
           {loading ? (
             <TableSkeleton rows={6} columns={columns.length} />
-          ) : transactions?.length === 0 ? (
+          ) : Array.isArray(transactions) && transactions.length === 0 ? (
             <EmptyState
               message="Nothing to display here yet. "
             />
@@ -110,7 +110,7 @@ export default function TransactionComponent() {
                 </TableHeader>
 
                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                  {transactions?.map((msg: any) => (
+                  {Array.isArray(transactions) ? transactions.map((msg: ITransaction) => (
                     <TableRow key={msg._id}>
                       {columns.map((col) => (
                         <TableCell key={col.key} className="px-5 py-4 text-start">
@@ -119,7 +119,7 @@ export default function TransactionComponent() {
                         </TableCell>
                       ))}
                     </TableRow>
-                  ))}
+                  )) : null}
                 </TableBody>
               </Table>
               <div className="mt-6">

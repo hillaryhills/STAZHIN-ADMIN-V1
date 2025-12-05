@@ -38,6 +38,20 @@ export const getAllTransactions = createAsyncThunk(
     }
 );
 
+export const getTransactionById = createAsyncThunk(
+    'transaction/getTransactionById',
+    async (id: string, thunkAPI) => {
+        try {
+            const response = await ApiGet(`transfer/get-single-payout-byId/${id}`);
+
+            return thunkAPI.fulfillWithValue(response);
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
+
 
 const transactionSlice = createSlice({
     name: 'transaction',
@@ -62,6 +76,22 @@ const transactionSlice = createSlice({
         })
 
         builder.addCase(getAllTransactions.rejected, (state, { payload }) => {
+            state.loading = false
+            state.error = payload
+        })
+
+
+        //getTransactionById
+        builder.addCase(getTransactionById.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+        builder.addCase(getTransactionById.fulfilled, (state, { payload }) => {
+            state.loading = false
+            state.success = true
+            state.singleTransaction = payload.data
+        })
+        builder.addCase(getTransactionById.rejected, (state, { payload }) => {
             state.loading = false
             state.error = payload
         })

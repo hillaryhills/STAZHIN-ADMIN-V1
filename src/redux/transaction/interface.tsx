@@ -12,14 +12,14 @@ export interface ITransactionState {
     loading: boolean
     error: null | unknown
     success: boolean
-    transactions: any | null
+    transactions: ITransactionData | null
     pagination: any | null
-    singleTransaction: any | null
+    singleTransaction: ITransaction | null
 }
 
 export interface ITransaction {
   _id: string;
-  userId: string;
+  userId: IUser;
   reference_no: string;
   account_type: string;
 
@@ -43,6 +43,11 @@ export interface ITransaction {
   updatedAt: string;
 
   user: IUser;
+  response?: string;
+}
+
+export interface ITransactionData {
+  data: ITransaction[]
 }
 
 export interface ITableInput{
@@ -131,7 +136,7 @@ export const renderColumn = (
             <span className="text-black dark:text-brand-25">
                 <MoreDotIcon
                     className="cursor-pointer"
-                    onClick={() => navigate(`/transaction/${item._id}`)}
+                    onClick={() => navigate(`/transactions/${item._id}`)}
                 />
             </span>
         ),

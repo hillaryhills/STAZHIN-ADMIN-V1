@@ -4,13 +4,15 @@ import messageCenterReducer from '../messageCenter'
 import userReducer from '../user'
 import transactionReducer from '../transaction'
 import appReducer from '../app'
+import fxEngineReducer from '../fx-engine'
 
 const rootReducer = combineReducers({
   auth: authReducer,
   messageCenter: messageCenterReducer,
   user: userReducer,
   transaction: transactionReducer,
-  app: appReducer
+  app: appReducer,
+  fxEngine: fxEngineReducer,
 })
 
 export const store = configureStore({
