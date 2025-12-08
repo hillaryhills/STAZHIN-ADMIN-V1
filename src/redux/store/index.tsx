@@ -4,13 +4,19 @@ import messageCenterReducer from '../messageCenter'
 import userReducer from '../user'
 import transactionReducer from '../transaction'
 import appReducer from '../app'
+import fxEngineReducer from '../fx-engine'
+import bankMethodReducer from '../bankMethod'
+import vaProviderReducer from '../vaProvider'
 
 const rootReducer = combineReducers({
   auth: authReducer,
   messageCenter: messageCenterReducer,
   user: userReducer,
   transaction: transactionReducer,
-  app: appReducer
+  app: appReducer,
+  fxEngine: fxEngineReducer,
+  bankMethod: bankMethodReducer,
+  vaProvider: vaProviderReducer,
 })
 
 export const store = configureStore({

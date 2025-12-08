@@ -46,6 +46,20 @@ const navItems: NavItem[] = [
     path: "/message-center",
   },
 
+  {
+    name: "Bank/Fx Engine",
+    icon: <ListIcon />,
+    subItems: [
+      { name: "Fx Engine", path: "/fx-engine" },
+      { name: "Bank Method", path: "/bank-method" },
+      { name: "Bank List", path: "/bank-list" },
+    ],
+  },
+    {
+    name: "VA providers",
+    icon: <ListIcon />,
+    path: "/va-providers",
+  },
 ];
 
 const othersItems: NavItem[] = [

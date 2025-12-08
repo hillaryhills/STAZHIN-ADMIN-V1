@@ -228,7 +228,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                     } ${isSelected ? "bg-primary/10" : ""}`}
                     onClick={() => handleSelect(option.value)}
                     role="option"
-                    aria-selected={isSelected}
+                    aria-selected={isSelected ? true : false}
                   >
                     <div className="relative flex w-full items-center p-2 pl-2">
                       <div className="mx-2 leading-6 text-gray-800 dark:text-white/90">

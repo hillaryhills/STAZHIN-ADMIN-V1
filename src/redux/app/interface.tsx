@@ -159,6 +159,8 @@ export interface IAppState {
     error: null | unknown
     success: boolean
     data: IDashboardCount | null
+    countries: ICountry[] | null
+    fxProviders: IFxProvider[] | null
 }
 export interface IDashboardCount {
   users: {
@@ -176,4 +178,20 @@ export interface IDashboardCount {
 
 export interface IDashboardCountQuery {
   nDays?: number;
+}
+
+export interface ICurrency {
+    name: string;
+    _id: string;
+}
+
+export interface IFxProvider {
+    _id: string;
+    provider_name: string;
+    currency: ICurrency[];
+    wallet_type: string; // could be 'fiat' | 'crypto' if you want stricter typing
+    virtual_wallet: string; // could be 'active' | 'inactive' if you want stricter typing
+    fx_type: string; // could be 'forward_trade' | 'spot_trade', etc.
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
 }

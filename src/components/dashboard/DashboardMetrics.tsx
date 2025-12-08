@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -12,13 +12,13 @@ import { getDashboardCount } from "../../redux/app";
 
 export default function DashboardMetrics() {
   const dispatch = useDispatch<AppDispatch>();
-  const [nDays, setnDays] = useState(60);
+  const nDays = 60
 
   const { data } = useSelector((state: RootState) => state.app);
 
   useEffect(() => {
     dispatch(getDashboardCount({ nDays }));
-  }, [nDays]);
+  }, [dispatch]);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">

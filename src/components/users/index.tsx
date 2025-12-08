@@ -40,7 +40,7 @@ export default function UsersComponent() {
   // Load initial messages
   useEffect(() => {
     dispatch(getAllUsers({ page, limit, search }));
-  }, [page, limit, search]);
+  }, [dispatch, page, limit, search]);
 
   // Search (debounced)
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function UsersComponent() {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [search]);
+  }, [dispatch, search]);
 
   return (
     <div>
@@ -95,50 +95,50 @@ export default function UsersComponent() {
         </div>
 
 
-      <div className="mx-auto w-full overflow-x-auto">
+        <div className="mx-auto w-full overflow-x-auto">
 
-  {loading ? (
-    <TableSkeleton rows={8} columns={columns.length} />
-  ) : (
-    <>
-      <Table>
-        <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-          <TableRow>
-            {columns.map((col) => (
-              <TableCell
-                key={col.key}
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                {col.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHeader>
+          {loading ? (
+            <TableSkeleton rows={8} columns={columns.length} />
+          ) : (
+            <>
+              <Table>
+                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                  <TableRow>
+                    {columns.map((col) => (
+                      <TableCell
+                        key={col.key}
+                        isHeader
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        {col.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHeader>
 
-        <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-          {users?.map((msg) => (
-            <TableRow key={msg._id}>
-              {columns.map((col) => (
-                <TableCell key={col.key} className="px-5 py-4 text-start">
-                  {renderColumn(msg, selected, toggleSelect, navigate)[col.key]}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                  {users?.map((msg) => (
+                    <TableRow key={msg._id}>
+                      {columns.map((col) => (
+                        <TableCell key={col.key} className="px-5 py-4 text-start">
+                          {renderColumn(msg, selected, toggleSelect, navigate)[col.key]}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
 
-      <div className="mt-6">
-        <Pagination
-          currentPage={pagination?.currentPage || 1}
-          totalPages={pagination?.totalPages || 1}
-          onPageChange={(newPage) => setPage(newPage)}
-        />
-      </div>
-    </>
-  )}
-</div>
+              <div className="mt-6">
+                <Pagination
+                  currentPage={pagination?.currentPage || 1}
+                  totalPages={pagination?.totalPages || 1}
+                  onPageChange={(newPage) => setPage(newPage)}
+                />
+              </div>
+            </>
+          )}
+        </div>
 
       </div>
     </div>
