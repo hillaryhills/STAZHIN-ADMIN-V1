@@ -10,8 +10,14 @@ export interface IUserState {
   error: null | unknown
   success: boolean
   users: IUser[] | null
-  pagination: any | null
+  pagination: IPagination | null
   singleUser: IUser | null
+}
+
+export interface IPagination {
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
 }
 
 export interface IUser {

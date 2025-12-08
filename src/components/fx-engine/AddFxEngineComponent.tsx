@@ -21,6 +21,9 @@ interface FxEngineFormData {
     fx_provider: string;
     operation_type: "divide" | "multiply";
     status: boolean
+    min_rate: string;
+    max_rate: string;
+    rate_step: string;
 }
 
 interface VolumeRange {
@@ -55,7 +58,10 @@ export default function AddFxEngineComponent() {
         promo_rate: "",
         fx_provider: "",
         operation_type: "divide",
-        status: false
+        status: false,
+        min_rate: "",
+        max_rate: "",
+        rate_step: ""
     });
 
     const { fxProviders, countries } = useSelector((state: RootState) => state.app);
@@ -89,7 +95,7 @@ export default function AddFxEngineComponent() {
     ]);
 
 
-    const handleInputChange = (field: keyof FxEngineFormData, value: string | boolean) => {
+    const handleInputChange = (field: keyof FxEngineFormData, value: string | number | boolean) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
@@ -149,6 +155,9 @@ export default function AddFxEngineComponent() {
                 max: Number(item.max),
                 fees: Number(item.fees),
             })),
+            min_rate: formData.min_rate,
+            max_rate: formData.max_rate,
+            rate_step: formData.rate_step
         };
 
         try {
@@ -190,7 +199,10 @@ export default function AddFxEngineComponent() {
             promo_rate: "",
             fx_provider: "",
             operation_type: "divide",
-            status: false
+            status: false,
+            min_rate: "",
+            max_rate: "",
+            rate_step: ""
         });
         setVolumeRanges([{ id: 1, min: "", max: "", rate: "" }]);
         setFxFees([{ id: 1, min: "", max: "", fees: "" }]);
@@ -257,6 +269,36 @@ export default function AddFxEngineComponent() {
                                 />
                             </div>
                         </div>
+                        
+                        {/* Min_Rate | Max_Rate | Rate_Step */}
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                            <div>
+                                <Label>Min Rate</Label>
+                                <Input
+                                    type="text"
+                                    value={formData.min_rate}
+                                    onChange={(e) => handleInputChange("min_rate", e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <Label>Max Rate</Label>
+                                <Input
+                                    type="text"
+                                    value={formData.max_rate}
+                                    onChange={(e) => handleInputChange("max_rate", e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <Label>Rate Step</Label>
+                                <Input
+                                    type="text"
+                                    value={formData.rate_step}
+                                    onChange={(e) => handleInputChange("rate_step", e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+
 
                         {/* FX Provider */}
                         <div>

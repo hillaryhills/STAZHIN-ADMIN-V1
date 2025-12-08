@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../common/PageBreadCrumb";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,8 +10,10 @@ import Radio from "../form/input/Radio";
 import Label from "../form/Label";
 import Select from "../form/Select";
 import { getFxProviders, getCountries } from "../../redux/app";
-import { updateFxEngine } from "../../redux/fx-engine";
+import { updateFxEngine, getSingleFxEngine } from "../../redux/fx-engine";
 import Alert from "../ui/alert/Alert";
+import { useParams } from "react-router-dom";
+
 
 interface FxEngineFormData {
     source_country: string;
@@ -21,7 +22,10 @@ interface FxEngineFormData {
     promo_rate: string;
     fx_provider: string;
     operation_type: "divide" | "multiply";
-    status: boolean
+    status: boolean,
+    min_rate: string;
+    max_rate: string;
+    rate_step: string;
 }
 
 interface VolumeRange {
@@ -45,12 +49,34 @@ interface Option {
 
 export default function UpdateFxEngineComponent() {
     const dispatch = useDispatch<AppDispatch>();
-    const location = useLocation();
-    const fxEngine = location.state?.fxEngine;
-    console.log("Editing FX Engine:", fxEngine);
+    const { id } = useParams();
 
-    const [loading, setLoading] = useState(false);
-    const [alert, setAlert] = useState<{ variant: "success" | "error" | "warning" | "info"; title: string; message: string } | null>(null);
+    const { singleFxEngine, loading } = useSelector(
+        (state: RootState) => state.fxEngine
+    );
+
+    const { fxProviders, countries } = useSelector(
+        (state: RootState) => state.app
+    );
+
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [alert, setAlert] = useState<{
+        variant: "success" | "error" | "warning" | "info";
+        title: string;
+        message: string;
+    } | null>(null);
+
+
+    useEffect(() => {
+        if (!id) return;
+
+        dispatch(getSingleFxEngine(id))
+            .unwrap()
+            .then(() => console.log("Transaction fetched"))
+            .catch((err) => console.error("Error fetching transaction:", err));
+    }, [id, dispatch]);
+
+    const fxEngine = singleFxEngine;
 
 
     const [formData, setFormData] = useState({
@@ -60,30 +86,33 @@ export default function UpdateFxEngineComponent() {
         promo_rate: "",
         fx_provider: "",
         operation_type: "divide",
-        status: false
+        status: false,
+        min_rate: "",
+        max_rate: "",
+        rate_step: ""
     });
 
-    const { fxProviders, countries } = useSelector((state: RootState) => state.app);
 
     useEffect(() => {
-        if (!fxProviders) {
-            dispatch(getFxProviders());
-        }
-        if (!countries) {
-            dispatch(getCountries());
-        }
+        if (!fxProviders) dispatch(getFxProviders());
+        if (!countries) dispatch(getCountries());
     }, [dispatch, fxProviders, countries]);
 
-    // Safe formatting
-    const formattedCountries: Option[] = countries?.map((item) => ({
-        value: item.currencyCode,
-        label: `${item.country} (${item.currencyCode})`,
-    })) || [];
 
-    const formattedFxProviders: Option[] = fxProviders?.map((item) => ({
-        value: item.provider_name,
-        label: item.provider_name,
-    })) || [];
+    const formattedCountries: Option[] =
+        countries?.map((item) => ({
+            value: item.currencyCode,
+            label: `${item.country} (${item.currencyCode})`,
+            active: item.currencyCode === fxEngine?.source_country, // highlight active one
+        })) || [];
+
+    const formattedFxProviders: Option[] =
+        fxProviders?.map((item) => ({
+            value: item.provider_name,
+            label: item.provider_name,
+            active: item.provider_name === fxEngine?.fx_provider,
+        })) || [];
+
 
     const [volumeRanges, setVolumeRanges] = useState([
         { id: 1, min: "", max: "", rate: "" }
@@ -93,43 +122,53 @@ export default function UpdateFxEngineComponent() {
         { id: 1, min: "", max: "", fees: "" }
     ]);
 
+
     useEffect(() => {
-        if (fxEngine) {
-            setFormData({
-                source_country: fxEngine.source_country || "",
-                destination_country: fxEngine.destination_country || "",
-                rate: fxEngine.rate?.toString() || "",
-                promo_rate: fxEngine.promo_rate?.toString() || "",
-                fx_provider: fxEngine.fx_provider || "",
-                operation_type: fxEngine.operation_type || "divide",
-                status: fxEngine.status || false,
-            });
+        if (!fxEngine) return;
 
-            setVolumeRanges(
-                fxEngine.volume?.map((item: { min?: number | string; max?: number | string; rate?: number | string }) => ({
-                    id: Date.now() + Math.random(),
-                    min: item.min?.toString() || "",
-                    max: item.max?.toString() || "",
-                    rate: item.rate?.toString() || ""
-                })) || [{ id: 1, min: "", max: "", rate: "" }]
-            );
+        // 1. Fill main fields
+        setFormData({
+            source_country: fxEngine.source_country || "",
+            destination_country: fxEngine.destination_country || "",
+            rate: fxEngine.rate ? String(fxEngine.rate) : "",
+            promo_rate: fxEngine.promo_rate ? String(fxEngine.promo_rate) : "",
+            fx_provider: fxEngine.fx_provider || "",
+            operation_type: fxEngine.operation_type || "divide",
+            status: fxEngine.status === true,
+            min_rate: fxEngine.min_rate || "",
+            max_rate: fxEngine.max_rate || "",
+            rate_step: fxEngine.rate_step || "",
+        });
 
-            setFxFees(
-                fxEngine.fx_fees?.map((item: { min?: number | string; max?: number | string; rate?: number | string }) => ({
-                    id: Date.now() + Math.random(),
-                    min: item.min?.toString() || "",
-                    max: item.max?.toString() || "",
-                    fees: item.fees?.toString() || ""
-                })) || [{ id: 1, min: "", max: "", fees: "" }]
-            );
+        // 2. Volume Ranges
+        if (fxEngine.volume?.length > 0) {
+            setVolumeRanges(fxEngine.volume.map(item => ({
+                id: Date.now() + Math.random(),
+                min: String(item.min),
+                max: String(item.max),
+                rate: String(item.rate),
+            })));
+        }
+
+        // 3. FX Fees
+        if (fxEngine.fx_fees?.length > 0) {
+            setFxFees(fxEngine.fx_fees.map(item => ({
+                id: Date.now() + Math.random(),
+                min: String(item.min),
+                max: String(item.max),
+                fees: String(item.fees),
+            })));
         }
     }, [fxEngine]);
 
 
-
-    const handleInputChange = (field: keyof FxEngineFormData, value: string | boolean) => {
+    const handleInputChange = (
+        field: keyof FxEngineFormData,
+        value: string | number | boolean
+    ) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
+
 
     const addVolumeRange = () => {
         setVolumeRanges(prev => [...prev, { id: Date.now(), min: "", max: "", rate: "" }]);
@@ -147,6 +186,7 @@ export default function UpdateFxEngineComponent() {
         );
     };
 
+
     const addFxFee = () => {
         setFxFees(prev => [...prev, { id: Date.now(), min: "", max: "", fees: "" }]);
     };
@@ -163,9 +203,10 @@ export default function UpdateFxEngineComponent() {
         );
     };
 
+
     const handleSubmit = async () => {
         setAlert(null);
-        setLoading(true);
+        setSubmitLoading(true);
 
         try {
             const data = {
@@ -186,25 +227,28 @@ export default function UpdateFxEngineComponent() {
                     max: Number(item.max),
                     fees: Number(item.fees),
                 })),
+                min_rate: formData.min_rate,
+                max_rate: formData.max_rate,
+                rate_step: formData.rate_step
             };
 
-            const res = await dispatch(updateFxEngine({ id: fxEngine!._id, data })).unwrap() as { message?: string };
+            const res = await dispatch(
+                updateFxEngine({ id: fxEngine!._id, data })
+            ).unwrap();
 
             setAlert({
                 variant: "success",
                 title: "FX Engine Updated",
-                message: res?.message || "FX Engine updated successfully.",
+                message: (res as { message?: string })?.message || "FX Engine updated successfully.",
             });
-
         } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : "Something went wrong while saving.";
             setAlert({
                 variant: "error",
                 title: "Update Failed",
-                message: errorMessage,
+                message: err instanceof Error ? err.message : "Something went wrong.",
             });
         } finally {
-            setLoading(false);
+            setSubmitLoading(false);
         }
     };
 
@@ -217,11 +261,16 @@ export default function UpdateFxEngineComponent() {
             promo_rate: "",
             fx_provider: "",
             operation_type: "divide",
-            status: false
+            status: false,
+            min_rate: "",
+            max_rate: "",
+            rate_step: ""
         });
+
         setVolumeRanges([{ id: 1, min: "", max: "", rate: "" }]);
         setFxFees([{ id: 1, min: "", max: "", fees: "" }]);
     };
+
 
     return (
         <div>
@@ -235,7 +284,7 @@ export default function UpdateFxEngineComponent() {
                         message={alert.message}
                     />
                 )}
-                {loading && (
+                {submitLoading || loading && (
                     <div className="mb-4">
                         <Loader />
                     </div>
@@ -281,6 +330,34 @@ export default function UpdateFxEngineComponent() {
                                 <Input
                                     value={formData.promo_rate}
                                     onChange={(e) => handleInputChange("promo_rate", e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Min_Rate | Max_Rate | Rate_Step */}
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                            <div>
+                                <Label>Min Rate</Label>
+                                <Input
+                                    type="text"
+                                    value={formData.min_rate}
+                                    onChange={(e) => handleInputChange("min_rate", e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <Label>Max Rate</Label>
+                                <Input
+                                    type="text"
+                                    value={formData.max_rate}
+                                    onChange={(e) => handleInputChange("max_rate", e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <Label>Rate Step</Label>
+                                <Input
+                                    type="text"
+                                    value={formData.rate_step}
+                                    onChange={(e) => handleInputChange("rate_step", e.target.value)}
                                 />
                             </div>
                         </div>

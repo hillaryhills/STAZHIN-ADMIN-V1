@@ -53,8 +53,12 @@ const navItems: NavItem[] = [
       { name: "Fx Engine", path: "/fx-engine" },
       { name: "Bank Method", path: "/bank-method" },
       { name: "Bank List", path: "/bank-list" },
-
     ],
+  },
+    {
+    name: "VA providers",
+    icon: <ListIcon />,
+    path: "/va-providers",
   },
 ];
 

@@ -68,6 +68,19 @@ export const updateFxEngine = createAsyncThunk<unknown, { id: string; data: IFor
     }
 );
 
+export const getSingleFxEngine = createAsyncThunk(
+    'fx-engine/getSingleFxEngine',
+    async (id: string, thunkAPI) => {
+        try {
+            const response = await ApiGet(`fx/${id}`);
+            return thunkAPI.fulfillWithValue(response);
+        }
+        catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
 
 const fxEngineSlice = createSlice({
     name: 'fxEngine',
@@ -134,6 +147,23 @@ const fxEngineSlice = createSlice({
         })
 
         builder.addCase(updateFxEngine.rejected, (state, { payload }) => {
+            state.loading = false
+            state.error = payload
+        })
+
+        // getSingleFxEngine
+        builder.addCase(getSingleFxEngine.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+
+        builder.addCase(getSingleFxEngine.fulfilled, (state, { payload }) => {
+            state.loading = false
+            state.success = true
+            state.singleFxEngine = payload.data
+        })
+
+        builder.addCase(getSingleFxEngine.rejected, (state, { payload }) => {
             state.loading = false
             state.error = payload
         })

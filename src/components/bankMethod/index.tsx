@@ -8,92 +8,63 @@ import {
     TableHeader,
     TableRow,
 } from "../ui/table";
+import { columns, renderColumn, IBankMethod } from "../../redux/bankMethod/interface";
+import { getAllBankMethods, deletebankMethod } from "../../redux/bankMethod";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import Input from "../form/input/InputField";
 import Pagination from "../ui/pagination";
+import { useNavigate } from "react-router-dom";
 import TableSkeleton from "../ui/skeleton/TableSkeleton";
 import EmptyState from "../ui/empty/EmptyState";
-import { columns, renderColumn, IFxEngine } from "../../redux/fx-engine/interface";
-import { getAllFxEngines, deleteFxEngine } from "../../redux/fx-engine";
 import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import { Link } from 'react-router-dom';
 import { PlusIcon } from "../../icons";
-import { useNavigate } from "react-router-dom";
 
 
-export default function FxEngineComponent() {
+
+export default function BankMethodComponent() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-
     const [selected, setSelected] = useState<string[]>([]);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(5);
+    const [limit, setLimit] = useState(10);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState<string | null>(null);
-    const [selectedFx, setSelectedFx] = useState<IFxEngine | null>(null);
+    const [selectedFx, setSelectedFx] = useState<IBankMethod | null>(null);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
 
     const toggleDropdown = (id: string | null) => {
         setOpenDropdown(openDropdown === id ? null : id);
     };
 
-    const handleView = (item: IFxEngine) => {
+
+    const handleView = (item: IBankMethod) => {
         setIsModalOpen(true);
         setSelectedFx(item);
         setModalType('view');
         setOpenDropdown(null);
     };
 
-    const handleEdit = (item: IFxEngine) => {
-        navigate(`/fx-engine/update/${item._id}`);
+    const handleEdit = (item: IBankMethod) => {
+        navigate(`/bank-method/update/${item._id}`);
         setOpenDropdown(null);
     };
-
-    const toggleSelect = (id: string) => {
-        setSelected((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
-    };
-    const { fxEngines, loading } = useSelector(
-        (state: RootState) => state.fxEngine
-    );
-
-    useEffect(() => {
-        dispatch(getAllFxEngines());
-    }, [dispatch]);
-
-    const filteredData = fxEngines?.filter((item) => {
-        const term = search.toLowerCase();
-        return (
-            item.source_country.toLowerCase().includes(term) ||
-            item.destination_country.toLowerCase().includes(term) ||
-            String(item.rate).includes(term) ||
-            String(item.promo_rate).includes(term) ||
-            item.fx_provider.toLowerCase().includes(term)
-        );
-    });
-
-    // Pagination logic
-    const startIndex = (page - 1) * limit;
-    const paginatedData = filteredData?.slice(startIndex, startIndex + limit);
-
-    // Total pages
-    const totalPages = Math.ceil((filteredData?.length || 0) / limit);
 
     const handleDelete = (id: string) => {
         if (!id) return;
 
         if (!window.confirm("Are you sure you want to delete this item?")) return;
 
-        dispatch(deleteFxEngine(id))
+        dispatch(deletebankMethod(id))
             .unwrap()
             .then(() => {
                 setSelectedFx(null);
                 setIsModalOpen(false);
-                dispatch(getAllFxEngines());
+                dispatch(getAllBankMethods());
             })
             .catch((error) => {
                 console.error("Failed to delete FX Engine:", error);
@@ -101,16 +72,54 @@ export default function FxEngineComponent() {
     };
 
 
+    const toggleSelect = (id: string) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
+    };
+
+    const { bankMethods, pagination, loading } = useSelector(
+        (state: RootState) => state.bankMethod
+    );
+
+    // Load initial messages
+    useEffect(() => {
+        dispatch(getAllBankMethods({ page, limit, search }));
+    }, [dispatch, page, limit, search]);
+
+    // Search (debounced)
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            dispatch(getAllBankMethods({ page: 1, limit: 10, search }));
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [dispatch, search]);
+
+    const filteredData = bankMethods?.filter((item) => {
+        const term = search.toLowerCase();
+        return (
+            item.name.toLowerCase().includes(term) ||
+            item.transferTime.toLowerCase().includes(term) ||
+            String(item.senderCountry).includes(term)
+        );
+    });
+
+
     return (
         <div>
-            <PageMeta title="Stazhin Fx Engine" description="" />
-            <PageBreadcrumb pageTitle="Fx Engine" />
+            <PageMeta
+                title="Stahzin Bank Methods"
+                description="This is Stahzin Bank Methods page for Stahzin Application"
+            />
+            <PageBreadcrumb pageTitle="Bank Methods" />
             <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
                 <Button size="sm" className="mb-4" startIcon={<PlusIcon />} variant="primary">
-                    <Link to="/fx-engine/add" className="text-white">Add FX Engine</Link>
+                    <Link to="/bank-method/add" className="text-white">Add Bank Method</Link>
                 </Button>
-
+                {/* Search Bar */}
                 <div className="flex items-center justify-between mb-6">
+
+                    {/* SEARCH INPUT */}
                     <div className="w-full max-w-xs">
                         <Input
                             type="text"
@@ -120,6 +129,8 @@ export default function FxEngineComponent() {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
+
+                    {/* LIMIT DROPDOWN */}
                     <div>
                         <select
                             value={limit}
@@ -138,9 +149,10 @@ export default function FxEngineComponent() {
                 </div>
 
                 <div className="mx-auto w-full overflow-x-auto">
+
                     {loading ? (
                         <TableSkeleton rows={6} columns={columns.length} />
-                    ) : paginatedData?.length === 0 ? (
+                    ) : Array.isArray(filteredData) && filteredData.length === 0 ? (
                         <EmptyState
                             message="Nothing to display here yet. "
                         />
@@ -162,7 +174,7 @@ export default function FxEngineComponent() {
                                 </TableHeader>
 
                                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {paginatedData?.map((msg) => (
+                                    {filteredData?.map((msg) => (
                                         <TableRow key={msg._id}>
                                             {columns.map((col) => (
                                                 <TableCell key={col.key} className="px-5 py-4 text-start">
@@ -177,9 +189,9 @@ export default function FxEngineComponent() {
                                                             handleEdit,
                                                             handleDelete
                                                         )[col.key]
+
                                                     }
                                                 </TableCell>
-
                                             ))}
                                         </TableRow>
                                     ))}
@@ -188,8 +200,8 @@ export default function FxEngineComponent() {
 
                             <div className="mt-6">
                                 <Pagination
-                                    currentPage={page}
-                                    totalPages={totalPages}
+                                    currentPage={pagination?.currentPage || 1}
+                                    totalPages={pagination?.totalPages || 1}
                                     onPageChange={(newPage) => setPage(newPage)}
                                 />
                             </div>
@@ -198,7 +210,9 @@ export default function FxEngineComponent() {
                 </div>
 
             </div>
-            
+
+            {/* Modal for View/Delete can be added here */}
+
             {/* View Modal */}
             <Modal
                 isOpen={isModalOpen && modalType === 'view'}
@@ -214,19 +228,13 @@ export default function FxEngineComponent() {
 
                         {/* Basic Details */}
                         <div className="grid grid-cols-3 gap-6 p-6 rounded-xl border border-gray-200 bg-gray-50 
-                dark:bg-gray-800/50 dark:border-gray-700">
+                            dark:bg-gray-800/50 dark:border-gray-700">
 
                             {[
-                                ["Source Country", selectedFx.source_country],
-                                ["Destination Country", selectedFx.destination_country],
-                                ["Rate", selectedFx.rate],
-                                ["Min Rate", selectedFx.min_rate],
-                                ["Max Rate", selectedFx.max_rate],
-                                ["Rate Step", selectedFx.rate_step],
-                                ["Promo Rate", selectedFx.promo_rate],
-                                ["Operation Type", selectedFx.operation_type],
-                                ["FX Provider", selectedFx.fx_provider],
-                                ["Status", selectedFx.status ? "Active" : "Inactive"],
+                                ["Name", selectedFx.name],
+                                ["Transfer Time", selectedFx.transferTime],
+                                ["Sender Country", selectedFx.senderCountry],
+                                ["Status", selectedFx.active ? "Active" : "Inactive"],
                                 ["Created At", new Date(selectedFx.createdAt).toLocaleString()],
                             ].map(([label, value]) => (
                                 <div key={label} className="flex flex-col space-y-1">
@@ -240,10 +248,10 @@ export default function FxEngineComponent() {
                             ))}
                         </div>
 
-                        {/* Volume Tiers */}
+                        {/* Bank Fees */}
                         <div>
                             <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-                                Volume Tiers
+                                Bank Fees
                             </h3>
                             <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                                 <table className="w-full text-sm">
@@ -255,14 +263,14 @@ export default function FxEngineComponent() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {selectedFx.volume?.map((v) => (
+                                        {selectedFx.bank_fees?.map((v) => (
                                             <tr
                                                 key={v._id}
                                                 className="border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                             >
                                                 <td className="px-4 py-3">{v.min}</td>
                                                 <td className="px-4 py-3">{v.max}</td>
-                                                <td className="px-4 py-3">{v.rate}</td>
+                                                <td className="px-4 py-3">{v.fees}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -270,35 +278,6 @@ export default function FxEngineComponent() {
                             </div>
                         </div>
 
-                        {/* Fees */}
-                        <div>
-                            <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-                                FX Fees
-                            </h3>
-                            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                                <table className="w-full text-sm">
-                                    <thead className="bg-gray-100 dark:bg-gray-700/60 text-gray-900 dark:text-gray-200">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left font-semibold">Min</th>
-                                            <th className="px-4 py-3 text-left font-semibold">Max</th>
-                                            <th className="px-4 py-3 text-left font-semibold">Fees</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {selectedFx.fx_fees?.map((f) => (
-                                            <tr
-                                                key={f._id}
-                                                className="border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                            >
-                                                <td className="px-4 py-3">{f.min}</td>
-                                                <td className="px-4 py-3">{f.max}</td>
-                                                <td className="px-4 py-3">{f.fees}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </div>
                 )}
             </Modal>
@@ -330,7 +309,7 @@ export default function FxEngineComponent() {
                     </h2>
 
                     <p className="text-gray-600 dark:text-gray-300 max-w-sm">
-                        Are you sure you want to delete this FX Engine? This action cannot be undone.
+                        Are you sure you want to delete this Bank Method? This action cannot be undone.
                     </p>
 
                     <div className="flex justify-center space-x-4 pt-4">
@@ -360,8 +339,6 @@ export default function FxEngineComponent() {
 
 
         </div>
-    );
+    )
 
 }
-
-

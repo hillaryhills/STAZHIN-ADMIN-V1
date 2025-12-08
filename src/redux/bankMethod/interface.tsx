@@ -1,89 +1,70 @@
 import { JSX } from "react"
 import { Column } from "../app/interface"
-import Badge from "../../components/ui/badge/Badge"
 import Checkbox from "../../components/form/input/Checkbox"
+import Badge from "../../components/ui/badge/Badge"
 import { MoreDotIcon } from "../../icons"
 import { Dropdown } from "../../components/ui/dropdown/Dropdown"
 import { DropdownItem } from "../../components/ui/dropdown/DropdownItem"
 
-export interface IFxEngineState {
+
+
+export interface IBankMethodState {
     loading: boolean
     error: null | unknown
     success: boolean
-    fxEngines: IFxEngine[] | null
+    bankMethods: IBankMethod[] | null
     pagination: IPagination | null
-    singleFxEngine: IFxEngine | null
+    singleBankMethod: IBankMethod | null
 }
 
 export interface IPagination {
     currentPage: number;
     totalPages: number;
-    total: number;
+    totalBankMethods: number;
 }
 
 
-export interface IFxEngine {
+export interface IBankMethod {
     _id: string;
-
-    source_country: string;
-    destination_country: string;
-
-    rate: number;
-    promo_rate: number;
-
-    volume: {
-        min: number;
-        max: number;
-        rate: number;
-        _id: string;
-    }[];
-
-    operation_type: "multiply" | "divide" | string;
-
-    fx_fees: {
+    name: string;
+    transferTime: string;
+    senderCountry: number;
+    active: boolean;
+    bank_fees: {
         min: number;
         max: number;
         fees: number;
         _id: string;
     }[];
-
-    fx_provider: string;
-    status: boolean;
-
-    min_rate: string;
-    max_rate: string;
-    rate_step: string;
-
     createdAt: string;
     updatedAt: string;
+
+    id: string; // duplicate of _id in the API
 }
 
 
 export const columns: Column[] = [
-    { key: "select", label: "#" },
-    { key: "source_country", label: "From" },
-    { key: "destination_country", label: "To" },
-    { key: "rate", label: "Rate" },
-    { key: "promo_rate", label: "Promo Rate" },
-    { key: "operation_type", label: "Operation Type" },
+    { key: "select", label: "" },
+    { key: "name", label: "Name" },
+    { key: "transfer_time", label: "Transfer Time" },
+    { key: "sender_country", label: "Sender Country" },
     { key: "status", label: "Status" },
-    { key: "fx_provider", label: "Provider" },
+    { key: "register_at", label: "Registered At" },
     { key: "action", label: "" },
 ];
 
 
 export const renderColumn = (
-    item: IFxEngine,
+    item: IBankMethod,
     selected: string[],
     toggleSelect: (id: string) => void,
 
     toggleDropdown: (id: string | null) => void,
     openDropdown: string | null,
-    handleView: (item: IFxEngine) => void,
-    handleEdit: (item: IFxEngine) => void,
+    handleView: (item: IBankMethod) => void,
+    handleEdit: (item: IBankMethod) => void,
     handleDelete: (id: string) => void
 ): Record<string, JSX.Element> => {
-
     return {
         select: (
             <Checkbox
@@ -91,46 +72,40 @@ export const renderColumn = (
                 onChange={() => toggleSelect(item._id)}
             />
         ),
-        source_country: (
+
+        name: (
             <span className="text-black dark:text-brand-25">
-                {item.source_country}
+                {item.name}
             </span>
         ),
 
-        destination_country: (
+
+        transfer_time: (
             <span className="text-black dark:text-brand-25">
-                {item.destination_country}
+                {item.transferTime}
             </span>
         ),
 
-        rate: (
+
+        sender_country: (
             <span className="text-black dark:text-brand-25">
-                {item.rate}
-            </span>
-        ),
-        promo_rate: (
-            <span className="text-black dark:text-brand-25">
-                {item.promo_rate}
+                {item.senderCountry}
             </span>
         ),
 
-        operation_type: (
-            <span className="text-black dark:text-brand-25">
-                {item.operation_type}
-            </span>
-        ),
 
         status: (
-            <Badge color={item.status ? "success" : "error"}>
-                {item.status ? "Active" : "Inactive"}
+            <Badge color={item.active ? "success" : "error"}>
+                {item.active ? "Active" : "Inactive"}
             </Badge>
         ),
 
-        fx_provider: (
+        register_at: (
             <span className="text-black dark:text-brand-25">
-                {item.fx_provider}
+                {new Date(item.createdAt).toLocaleDateString()}
             </span>
         ),
+
 
         action: (
             <div className="relative">
@@ -169,26 +144,17 @@ export const renderColumn = (
         )
 
 
-
-    };
-};
+    }
+}
 
 export interface IFormData {
-    source_country: string;
-    destination_country: string;
-    rate: number;
-    promo_rate: number;
-    operation_type: "multiply" | "divide" | string;
-    volume: {
-        min: number;
-        max: number;
-        rate: number;
-    }[];
-    fx_fees: {
+    name: string;
+    transferTime: string;
+    senderCountry: number;
+    active: boolean;
+    bank_fees: {
         min: number;
         max: number;
         fees: number;
     }[];
-    fx_provider: string;
-    status: boolean;
 }

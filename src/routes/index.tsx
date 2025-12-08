@@ -14,7 +14,12 @@ import SingleTransactionPage from "../app/transaction/SingleTransaction";
 import FxEnginePage from "../app/fx-engine";
 import AddFxEnginePage from "../app/fx-engine/AddFxEngine";
 import UpdateFxEnginePage from "../app/fx-engine/UpdateFxEngine";
-
+import BankMethodPage from "../app/bankMethod";
+import AddBankMethodPage from "../app/bankMethod/AddBankMethod";
+import UpdateBankMethodPage from "../app/bankMethod/UpdateBankMethod";
+import VAProviderPage from "../app/VaProvider";
+import AddVaProviderPage from "../app/VaProvider/AddVaProvider";
+import UpdateVaProviderPage from "../app/VaProvider/UpdateVaProvider";
 
 const AppRoutes = () => {
     return (
@@ -32,6 +37,13 @@ const AppRoutes = () => {
                     <Route index path="/fx-engine" element={<ProtectedRoute element={<FxEnginePage />} />} />
                     <Route index path="/fx-engine/add" element={<ProtectedRoute element={<AddFxEnginePage />} />} />
                     <Route index path="/fx-engine/update/:id" element={<ProtectedRoute element={<UpdateFxEnginePage />} />} />
+                    <Route index path="/bank-method" element={<ProtectedRoute element={<BankMethodPage />} />} />
+                    <Route index path="/bank-method/add" element={<ProtectedRoute element={<AddBankMethodPage />} />} />
+                    <Route index path="/bank-method/update/:id" element={<ProtectedRoute element={<UpdateBankMethodPage />} />} />
+                    <Route index path="/va-providers" element={<ProtectedRoute element={<VAProviderPage />} />} />
+
+                    <Route index path="/va-provider/add" element={<ProtectedRoute element={<AddVaProviderPage />} />} />
+                    <Route index path="/va-provider/update" element={<ProtectedRoute element={<UpdateVaProviderPage />} />} />
                     <Route path="/blank" element={<Blank />} />
                 </Route>
 

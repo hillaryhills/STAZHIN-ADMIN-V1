@@ -13,8 +13,14 @@ export interface ITransactionState {
     error: null | unknown
     success: boolean
     transactions: ITransactionData | null
-    pagination: any | null
+    pagination: IPagination | null
     singleTransaction: ITransaction | null
+}
+
+export interface IPagination {
+    currentPage: number;
+    totalPages: number;
+    total: number;
 }
 
 export interface ITransaction {
