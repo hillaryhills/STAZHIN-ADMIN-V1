@@ -151,21 +151,22 @@ export default function UpdateBankMethodComponent() {
         };
 
         try {
-            const res = await dispatch(updateBankMethod({ id: bankMethod!._id, data })).unwrap();
+            const res = await dispatch(updateBankMethod({ id: bankMethod!._id, data }))
+                .unwrap() as { data?: { name?: string }, message?: string };
+
             if (res.data?.name) {
                 setAlert({
                     variant: "success",
                     title: "Bank Method Created",
-                    message: (res as { message?: string })?.message || "Bank Method updated successfully.",
+                    message: res.message || "Bank Method updated successfully.",
                 });
             } else {
                 setAlert({
                     variant: "error",
                     title: "Creation Failed",
-                    message: (res as { message?: string })?.message || "Failed to create Bank Method",
+                    message: res.message || "Failed to create Bank Method",
                 });
             }
-
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "Something went wrong while saving.";
             setAlert({

@@ -20,6 +20,9 @@ import UpdateBankMethodPage from "../app/bankMethod/UpdateBankMethod";
 import VAProviderPage from "../app/VaProvider";
 import AddVaProviderPage from "../app/VaProvider/AddVaProvider";
 import UpdateVaProviderPage from "../app/VaProvider/UpdateVaProvider";
+import CompliancePage from "../app/kVBCompliance";
+import AddCompliancePage from "../app/kVBCompliance/AddCompliance";
+import BankListPage from "../app/bankList";
 
 const AppRoutes = () => {
     return (
@@ -43,7 +46,14 @@ const AppRoutes = () => {
                     <Route index path="/va-providers" element={<ProtectedRoute element={<VAProviderPage />} />} />
 
                     <Route index path="/va-provider/add" element={<ProtectedRoute element={<AddVaProviderPage />} />} />
-                    <Route index path="/va-provider/update" element={<ProtectedRoute element={<UpdateVaProviderPage />} />} />
+                    <Route index path="/va-provider/update/:id" element={<ProtectedRoute element={<UpdateVaProviderPage />} />} />
+                    <Route index path="/compliance" element={<ProtectedRoute element={<CompliancePage />} />} />
+                    <Route index path="/compliance/add" element={<ProtectedRoute element={<AddCompliancePage />} />} />
+                    <Route index path="/bank-list" element={<ProtectedRoute element={<BankListPage />} />} />
+
+                    
+
+
                     <Route path="/blank" element={<Blank />} />
                 </Route>
 

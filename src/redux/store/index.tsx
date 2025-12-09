@@ -7,6 +7,7 @@ import appReducer from '../app'
 import fxEngineReducer from '../fx-engine'
 import bankMethodReducer from '../bankMethod'
 import vaProviderReducer from '../vaProvider'
+import complianceReducer from '../kVBCompliance'
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   fxEngine: fxEngineReducer,
   bankMethod: bankMethodReducer,
   vaProvider: vaProviderReducer,
+  compliance: complianceReducer
 })
 
 export const store = configureStore({

@@ -55,10 +55,15 @@ const navItems: NavItem[] = [
       { name: "Bank List", path: "/bank-list" },
     ],
   },
-    {
+  {
     name: "VA providers",
     icon: <ListIcon />,
     path: "/va-providers",
+  },
+  {
+    name: "KVB Complience",
+    icon: <ListIcon />,
+    path: "/compliance",
   },
 ];
 

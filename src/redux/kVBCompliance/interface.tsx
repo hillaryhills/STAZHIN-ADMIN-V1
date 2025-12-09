@@ -1,64 +1,59 @@
 import { JSX } from "react"
 import { Column } from "../app/interface"
 import Checkbox from "../../components/form/input/Checkbox"
-import Badge from "../../components/ui/badge/Badge"
 import { MoreDotIcon } from "../../icons"
 import { Dropdown } from "../../components/ui/dropdown/Dropdown"
 import { DropdownItem } from "../../components/ui/dropdown/DropdownItem"
 
 
 
-export interface IVaProviderState {
+export interface IComplianceState {
     loading: boolean
     error: null | unknown
     success: boolean
-    vaProviders: IVaProvider[] | null
-    pagination: IPagination | null
-    singleVaProvider: IVaProvider | null
+    complianceRecords: ICompliance[] | null
+    singleComplianceRecords: ICompliance | null
 }
 
-export interface IVaProvider {
+export interface IComplianceInfo {
     _id: string;
-    provider_name: string;
-    currency: {
-        name: string;
-        _id: string;
-    }[];
-    wallet_type: string;
-    virtual_wallet: string;
-    fx_type: string;
+    accountPurpose: string[];
+    fundInCountries: string[];
+    fundInCcys: string[];
+    expectedFundInVolPerMonth: string;
+    fundOutCountries: string[];
+    fundOutCcys: string[];
+    expectedFundOutVolPerMonth: string;
+}
+
+export interface ICompliance {
+    _id: string;
+    accountType: string;
+    complianceInfo: IComplianceInfo;
     createdAt: string;
     updatedAt: string;
 }
 
-export interface IPagination {
-    currentPage: number;
-    totalPages: number;
-    total: number;
-}
-
-
 
 export const columns: Column[] = [
-    { key: "select", label: "" },
-    { key: "provider", label: "Provider" },
-    { key: "wallet_type", label: "Wallet Type" },
-    { key: "fx_type", label: "Fx Type" },
-    { key: "status", label: "Status" },
-    { key: "register_at", label: "Registered At" },
+    { key: "select", label: "#" },
+    { key: "account_type", label: "Account Type" },
+    { key: "funds_in", label: "Fund In Countries" },
+    { key: "funds_out", label: "Fund Out Countries" },
+    { key: "created_at", label: "Created At" },
     { key: "action", label: "" },
 ];
 
 
+
 export const renderColumn = (
-    item: IVaProvider,
+    item: ICompliance,
     selected: string[],
     toggleSelect: (id: string) => void,
 
     toggleDropdown: (id: string | null) => void,
     openDropdown: string | null,
-    handleView: (item: IVaProvider) => void,
-    handleEdit: (item: IVaProvider) => void,
+    handleView: (item: ICompliance) => void,
     handleDelete: (id: string) => void
 ): Record<string, JSX.Element> => {
     return {
@@ -69,34 +64,24 @@ export const renderColumn = (
             />
         ),
 
-        provider: (
+        account_type: (
             <span className="text-black dark:text-brand-25">
-                {item.provider_name}
+                {item.accountType}
             </span>
         ),
 
-
-        wallet_type: (
+        funds_in: (
             <span className="text-black dark:text-brand-25">
-                {item.wallet_type}
+                {item.complianceInfo.fundInCountries.join(", ")}
+            </span>
+        ),
+        funds_out: (
+            <span className="text-black dark:text-brand-25">
+                {item.complianceInfo.fundOutCountries.join(", ")}
             </span>
         ),
 
-
-        fx_type: (
-            <span className="text-black dark:text-brand-25">
-                {item.fx_type}
-            </span>
-        ),
-
-
-        status: (
-            <Badge color={item.virtual_wallet === 'active' ? "success" : "error"}>
-                {item.virtual_wallet}
-            </Badge>
-        ),
-
-        register_at: (
+        created_at: (
             <span className="text-black dark:text-brand-25">
                 {new Date(item.createdAt).toLocaleDateString()}
             </span>
@@ -123,11 +108,6 @@ export const renderColumn = (
                     <DropdownItem onClick={() => handleView(item)} className="text-gray-700 dark:text-gray-400">
                         View
                     </DropdownItem>
-
-                    <DropdownItem onClick={() => handleEdit(item)} className="text-gray-700 dark:text-gray-400">
-                        Edit
-                    </DropdownItem>
-
                     <DropdownItem
                         onClick={() => handleDelete(item._id)}
                         className="text-red-600 hover:bg-red-50"
@@ -137,19 +117,29 @@ export const renderColumn = (
                 </Dropdown>
             </div>
         )
-
-
     }
 }
 
+
 export interface IFormData {
-    provider_name: string;
-    currency: {
-        name: string;
-        _id?: string;
-        description?: string;
-    }[];
-    wallet_type: string;
-    virtual_wallet: string;
-    fx_type: string;
+    accountType: string;
+    complianceInfo: {
+        accountPurpose: string[];
+        fundInCountries: string[];
+        fundInCcys: string[];
+        expectedFundInVolPerMonth: string;
+        fundOutCountries: string[];
+        fundOutCcys: string[];
+        expectedFundOutVolPerMonth: string;
+    };
+}
+
+export interface IFormDataComplianceInfo {
+    accountPurpose: string[];
+    fundInCountries: string[];
+    fundInCcys: string[];
+    expectedFundInVolPerMonth: string;
+    fundOutCountries: string[];
+    fundOutCcys: string[];
+    expectedFundOutVolPerMonth: string;
 }
