@@ -1,9 +1,9 @@
-
+import UpdateVaProviderComponent from "../../components/vaProvider/UpdateVaProviderComponent";
 
 export default function UpdateVaProviderPage() {
     return (
         <>
-            <h1>Update va provider</h1>
+            <UpdateVaProviderComponent />
         </>
     );
 }
