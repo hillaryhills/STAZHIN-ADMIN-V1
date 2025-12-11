@@ -23,6 +23,7 @@ import UpdateVaProviderPage from "../app/VaProvider/UpdateVaProvider";
 import CompliancePage from "../app/kVBCompliance";
 import AddCompliancePage from "../app/kVBCompliance/AddCompliance";
 import BankListPage from "../app/bankList";
+import UserDetailsPage from "../app/users/UserDetails";
 
 const AppRoutes = () => {
     return (
@@ -51,7 +52,10 @@ const AppRoutes = () => {
                     <Route index path="/compliance/add" element={<ProtectedRoute element={<AddCompliancePage />} />} />
                     <Route index path="/bank-list" element={<ProtectedRoute element={<BankListPage />} />} />
 
-                    
+
+                    <Route index path="/user/:id" element={<ProtectedRoute element={<UserDetailsPage />} />} />
+
+
 
 
                     <Route path="/blank" element={<Blank />} />

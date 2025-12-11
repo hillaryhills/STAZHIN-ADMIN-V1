@@ -61,7 +61,7 @@ const navItems: NavItem[] = [
     path: "/va-providers",
   },
   {
-    name: "KVB Complience",
+    name: "KVB Complaince",
     icon: <ListIcon />,
     path: "/compliance",
   },

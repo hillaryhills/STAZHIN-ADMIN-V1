@@ -1,4 +1,4 @@
-import { ApiGet } from '../../api'
+import { ApiGet, ApiDelete } from '../../api'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import {
     IUserState
@@ -35,6 +35,50 @@ export const getAllUsers = createAsyncThunk(
     }
 );
 
+export const getSingleUser = createAsyncThunk(
+    'user/getSingleUser',
+    async (id: string, thunkAPI) => {
+        try {
+            const response = await ApiGet(`user/${id}`);
+            return thunkAPI.fulfillWithValue(response);
+        }
+        catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
+
+
+export const deleteUser = createAsyncThunk(
+    'user/deleteUser',
+    async (id: string, thunkAPI) => {
+        try {
+            const response = await ApiDelete(`user/${id}`);
+            return thunkAPI.fulfillWithValue(response);
+        }
+        catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
+
+
+export const logoutSession = createAsyncThunk(
+    'user/logoutSession',
+    async (id: string, thunkAPI) => {
+        try {
+            const response = await ApiDelete(`user/logout-session/${id}`);
+            return thunkAPI.fulfillWithValue(response);
+        }
+        catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
+
 
 const userSlice = createSlice({
     name: 'user',
@@ -59,6 +103,39 @@ const userSlice = createSlice({
         })
 
         builder.addCase(getAllUsers.rejected, (state, { payload }) => {
+            state.loading = false
+            state.error = payload
+        })
+
+
+        //get single user
+        builder.addCase(getSingleUser.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+        builder.addCase(getSingleUser.fulfilled, (state, { payload }) => {
+            state.loading = false
+            state.success = true
+            state.singleUser = payload.data
+        })
+
+        builder.addCase(getSingleUser.rejected, (state, { payload }) => {
+            state.loading = false
+            state.error = payload
+        })
+
+
+        //delete user
+        builder.addCase(deleteUser.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+        builder.addCase(deleteUser.fulfilled, (state) => {
+            state.loading = false
+            state.success = true
+        })
+
+        builder.addCase(deleteUser.rejected, (state, { payload }) => {
             state.loading = false
             state.error = payload
         })

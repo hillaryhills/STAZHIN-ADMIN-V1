@@ -3,7 +3,10 @@ import { Column } from "../app/interface"
 import Checkbox from "../../components/form/input/Checkbox"
 import { MoreDotIcon } from "../../icons"
 import Avatar from "../../components/ui/avatar/Avatar"
-
+import { formatDateTime } from "../../utils/fn";
+import { Dropdown } from "../../components/ui/dropdown/Dropdown"
+import { DropdownItem } from "../../components/ui/dropdown/DropdownItem"
+import { LogOut  } from "lucide-react";
 
 export interface IUserState {
   loading: boolean
@@ -11,13 +14,13 @@ export interface IUserState {
   success: boolean
   users: IUser[] | null
   pagination: IPagination | null
-  singleUser: IUser | null
+  singleUser: ISingleUser | null
 }
 
 export interface IPagination {
-    currentPage: number;
-    totalPages: number;
-    totalUsers: number;
+  currentPage: number;
+  totalPages: number;
+  totalUsers: number;
 }
 
 export interface IUser {
@@ -75,7 +78,7 @@ export interface ILoginHistory {
   isActive: boolean;
   token: string;
 
-  loginAt?: string;
+  loginAt: string | Date;
   _id: string;
   id: string;
 }
@@ -103,7 +106,12 @@ export const renderColumn = (
   item: IUser,
   selected: string[],
   toggleSelect: (id: string) => void,
-  navigate: (path: string) => void
+  navigate: (path: string) => void,
+  handleDelete: (id: string) => void,
+  toggleDropdown: (id: string | null) => void,
+  openDropdown: string | null,
+
+
 ): Record<string, JSX.Element> => {
 
   const fallbackImage = "/stazhin-img/user.png";
@@ -158,12 +166,121 @@ export const renderColumn = (
     ),
 
     action: (
+      <div className="relative">
+        {/* Toggle button */}
+        <div
+          className="cursor-pointer dropdown-toggle "
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleDropdown(item._id);
+          }}
+        >
+          <MoreDotIcon className="text-gray-700 dark:text-gray-400" />
+        </div>
+
+        <Dropdown
+          isOpen={openDropdown === item._id}
+          onClose={() => toggleDropdown(null)}
+          className="w-36"
+        >
+          <DropdownItem onClick={() => navigate(`/user/${item._id}`)} className="text-gray-700 dark:text-gray-400">
+            View
+          </DropdownItem>
+
+          <DropdownItem
+            onClick={() => handleDelete(item._id)}
+            className="text-red-600 hover:bg-red-50"
+          >
+            Delete
+          </DropdownItem>
+        </Dropdown>
+      </div>
+    )
+  };
+};
+
+
+
+export interface ISingleUser {
+  _id: string;
+  userType: string;
+  email: string;
+  currency: string;
+  business_name: string;
+  is_email_verified: boolean;
+  is_email_sent: boolean;
+  email_verification_token: string | null;
+  email_token_expiry: string | null;
+  otp: string | null;
+  otp_expiry: string | null;
+  user_img: string | null;
+  is_deleted: boolean;
+  deleteRequestedAt: string | null;
+  login_verification_token: string | null;
+  login_verification_expiry: string | null;
+  loginHistory: ILoginHistory[];
+  createdAt: string;
+  updatedAt: string;
+  is_onboarding: boolean;
+  beneficiaries: string[];
+  beneficiaryCount: number;
+}
+
+
+export const loginColumns = [
+  { key: "device", label: "Device" },
+  { key: "ip", label: "IP" },
+  { key: "location", label: "Location" },
+  { key: "loginAt", label: "Login Time" },
+  { key: "isActive", label: "Status" },
+  { key: "action", label: "Action" },
+
+];
+
+
+export const renderLoginColumn = (
+  item: ILoginHistory,
+  handleLogoutSession: (id: string) => void,
+): Record<string, JSX.Element> => {
+  return {
+    device: (
       <span className="text-black dark:text-brand-25">
-        <MoreDotIcon
-          className="cursor-pointer"
-          onClick={() => navigate(`/user/${item._id}`)}
-        />
+        {item.device}
       </span>
     ),
+    ip: (
+      <span className="text-black dark:text-brand-25">
+        {item.ip}
+      </span>
+    ),
+    location: (
+      <span className="text-black dark:text-brand-25">
+        {item.location}
+      </span>
+    ),
+    loginAt: (
+      <span className="text-black dark:text-brand-25">
+        {formatDateTime(item.loginAt)}
+      </span>
+    ),
+    isActive: (
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium ${item.isActive
+          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+          }`}
+      >
+        {item.isActive ? "Active" : "Inactive"}
+      </span>
+    ),
+    action: (
+      <div
+        onClick={() => handleLogoutSession(item._id)}
+        className="text-red-600  cursor-pointer"
+      >
+        <LogOut  />
+      </div>
+    )
+
   };
 };
