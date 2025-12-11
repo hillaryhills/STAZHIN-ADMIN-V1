@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { columns, renderColumn } from "../../redux/user/interface";
-import { getAllUsers } from "../../redux/user";
+import { getAllUsers, deleteUser } from "../../redux/user";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import Input from "../form/input/InputField";
@@ -26,12 +26,34 @@ export default function UsersComponent() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const toggleDropdown = (id: string | null) => {
+    setOpenDropdown(openDropdown === id ? null : id);
+  };
+
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
+
+  const handleDelete = (id: string) => {
+    if (!id) return;
+
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    dispatch(deleteUser(id))
+      .unwrap()
+      .then(() => {
+        dispatch(getAllUsers({ page: 1, limit: 20 }));
+      })
+      .catch((error) => {
+        console.error("Failed to delete FX Provider:", error);
+      });
+  };
+
 
   const { users, pagination, loading } = useSelector(
     (state: RootState) => state.user
@@ -121,7 +143,7 @@ export default function UsersComponent() {
                     <TableRow key={msg._id}>
                       {columns.map((col) => (
                         <TableCell key={col.key} className="px-5 py-4 text-start">
-                          {renderColumn(msg, selected, toggleSelect, navigate)[col.key]}
+                          {renderColumn(msg, selected, toggleSelect, navigate, handleDelete, toggleDropdown, openDropdown)[col.key]}
                         </TableCell>
                       ))}
                     </TableRow>

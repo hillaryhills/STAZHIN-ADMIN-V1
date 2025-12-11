@@ -125,8 +125,8 @@ export default function ComplianceComponent() {
 
     return (
         <div>
-            <PageMeta title="KVB Complience" description="" />
-            <PageBreadcrumb pageTitle="KVB Complience" />
+            <PageMeta title="KVB Complaince" description="" />
+            <PageBreadcrumb pageTitle="KVB Complaince" />
             <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
                 <Button size="sm" className="mb-4" startIcon={<PlusIcon />} variant="primary">
                     <Link to="/compliance/add" className="text-white">Add New</Link>
